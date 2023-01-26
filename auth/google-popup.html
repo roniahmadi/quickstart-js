@@ -36,6 +36,11 @@ limitations under the License.
   <script src="/__/firebase/init.js"></script>
 
   <script type="text/javascript">
+
+    let customUrl = '';
+    let customMethod = '';
+
+    
     function sendauth(){
       if (firebase.auth().currentUser) {
         firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
@@ -44,17 +49,65 @@ limitations under the License.
           const params = {
             id: idToken
           }
-
+          let axiosConfig = {
+            headers: {
+              Authorization: "Bearer "+idToken,
+              'Content-Type': 'application/json;charset=UTF-8',
+              "Access-Control-Allow-Origin": "*",
+            }
+          };
+          console.log(axiosConfig)
+          let data_parram = {
+              billingDetails: {
+                  firstName: "Roni",
+                  lastName: "Ahmadi",
+                  email: "",
+                  address: "",
+                  address2: "",
+                  city: "",
+                  state: "",
+                  zip: "",
+                  country: "",
+                  phone: ""
+              },
+              shippingDetails: {
+                  firstName: "",
+                  lastName: "",
+                  email: "",
+                  address: "",
+                  address2: "",
+                  city: "",
+                  state: "",
+                  zip: "",
+                  country: "",
+                  phone: ""
+              },
+              card:{
+                  fullName: "",
+                  number: "",
+                  expirationMonth: "",
+                  expirationYear: "",
+                  securityCode: ""
+              },
+              locale: "ID"
+          }
+          console.log(document.getElementById('customUrl').value)
+          console.log(document.getElementById('customMethod').value)
           axios({
-            method: 'post',
-            url: 'http://0.0.0.0:5001/fora-cryptocurrency/us-central1/user-checkID',
-            params: params
+            method: document.getElementById('customMethod').value,
+            url: document.getElementById('customUrl').value,
+            //url: 'http://localhost:5001/fora-cryptocurrency/us-central1/user-getPaymentRequest',
+            data: document.getElementById('customData').value,
+            headers: {
+                // 'Content-Type': 'application/json;charset=UTF-8',
+                Authorization: "Bearer "+idToken,
+                // "Access-Control-Allow-Origin": "http://localhost:5001/",
+            }
             // responseType: 'stream'
           })
           .then(function (response) {
             response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
           });
-
         }).catch(function(error) {
           // Handle error
         });
@@ -134,6 +187,12 @@ limitations under the License.
     window.onload = function() {
       initApp();
     };
+
+    function customInput() {
+      customUrl = document.getElementById('customUrl').value;
+      customMethod = document.getElementById('customMethod').value;
+      //alert(customMethod, customUrl);
+    }
   </script>
 </head>
 <body>
@@ -161,7 +220,16 @@ limitations under the License.
 
           <!-- Button that handles sign-in/sign-out -->
           <button disabled class="mdl-button mdl-js-button mdl-button--raised" id="quickstart-sign-in">Sign in with Google</button>
-          <button class="mdl-button mdl-js-button mdl-button--raised" id="send-sign-in">Sign in with Google</button>
+          <form action="">
+            <label for="url">URL:</label><br>
+            <input type="text" id="customUrl" name="url" value="url" style="width: 500px;"><br>
+            <label for="method">method:</label><br>
+            <input type="text" id="customMethod" name="method" value="method" style="width: 500px;"><br>
+            <label for="data">Data:</label><br>
+            <input type="textarea" id="customData" name="data" value="data" style="width: 500px; height: 400px;"><br><br>
+            <!-- <input type="submit" onclick="customInput();"> -->
+          </form>
+          <button class="mdl-button mdl-js-button mdl-button--raised" id="send-sign-in">Send</button>
 
           <!-- Container where we'll display the user details -->
           <div class="quickstart-user-details-container">
